@@ -2,6 +2,8 @@
 from multiprocessing import Process
 from time import sleep
 import requests
+from PIL import Image
+import io
 
 fileName = "newpic.jpg"
 ipAdresa = "http://192.168.0.101:4747"
@@ -27,11 +29,17 @@ if __name__ == '__main__':
     helperProcess.start()
     sleep(0.1)
 
-    rawImage = requests.get(ipAdresa + "/cam/1/frame.jpg", stream=True)
+    # requests.get returns response object
+    rawImageJpg = requests.get(ipAdresa + "/cam/1/frame.jpg", stream=True)
 
     helperProcess.terminate()
 
-    # save the image received into the file
-    with open(fileName, 'wb') as fd:
-        for chunk in rawImage.iter_content(chunk_size=1024):
-            fd.write(chunk)
+    # we need an io object to create a pil Image 
+    # a pil Image can be saved in any format we want png or jpg
+    ioObject = io.BytesIO(rawImageJpg.content)
+    pilImage = Image.open(ioObject)
+
+    pilImage.save(r'newpic.png')
+
+
+
