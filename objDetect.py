@@ -95,6 +95,7 @@ else:
         colorGraph = pickle.load(readFile)
 
 if __name__ == '__main__':
+
     print("Color graph ready after: {} seconds".format(thread_time())) 
 
     '''
@@ -120,9 +121,6 @@ if __name__ == '__main__':
     # a pil Image can be saved in any format we want png or jpg
     ioObject = io.BytesIO(serverResponse.content)
     pngImg = Image.open(ioObject)
-
-
-    #pngImg = Image.open("newpic.png")
     
     #croping image
     cpImg = pngImg.crop((0,15,pngImg.width,pngImg.height))
@@ -134,14 +132,14 @@ if __name__ == '__main__':
             pxl = simpleImg.getpixel((r,c))
             simpleImg.putpixel((r,c),colorGraph[pxl[0]][pxl[1]][pxl[2]])
     
-    print("Image simplified after {} seconds".format(thread_time())) 
+    imageWithEdges = simpleImg.filter(ImageFilter.FIND_EDGES)
+    imageWithoutFrame = removeFrame(imageWithEdges)
+
+    print("Image analyzed after {} seconds".format(thread_time()))
+
     pngImg.save("newpic.png")
     cpImg.save("cropImage.png")
     simpleImg.save("simpleImage.png")
-
-    imageWithEdges = cpImg.filter(ImageFilter.FIND_EDGES)
-    imageWithoutFrame = removeFrame(imageWithEdges)
-
     imageWithoutFrame.save("picAnalysis.png")
 
 
