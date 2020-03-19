@@ -9,7 +9,7 @@ import pickle
 
 fileName = "newpic.png"
 ipAdresa = "http://192.168.0.102:4747"
-recalColorGraph = False
+recalColorGraph = True
 
 def getVideoFeed():
     vidFeed = requests.get(ipAdresa+"/video")
@@ -121,21 +121,23 @@ if __name__ == '__main__':
     ioObject = io.BytesIO(serverResponse.content)
     pngImg = Image.open(ioObject)
 
-    pngImg.save("newpic.png")
 
     #pngImg = Image.open("newpic.png")
     
     #croping image
     cpImg = pngImg.crop((0,15,pngImg.width,pngImg.height))
-    cpImg.save("cropImage.png")
 
+    simpleImg = cpImg
     # filtering the image for colors
     for r in range(cpImg.width):
         for c in range(cpImg.height):
-            pxl = cpImg.getpixel((r,c))
-            cpImg.putpixel((r,c),colorGraph[pxl[0]][pxl[1]][pxl[2]])
+            pxl = simpleImg.getpixel((r,c))
+            simpleImg.putpixel((r,c),colorGraph[pxl[0]][pxl[1]][pxl[2]])
     
-    cpImg.save("simpleImage.png")
+    print("Image simplified after {} seconds".format(thread_time())) 
+    pngImg.save("newpic.png")
+    cpImg.save("cropImage.png")
+    simpleImg.save("simpleImage.png")
 
     imageWithEdges = cpImg.filter(ImageFilter.FIND_EDGES)
     imageWithoutFrame = removeFrame(imageWithEdges)
