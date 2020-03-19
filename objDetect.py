@@ -125,7 +125,7 @@ if __name__ == '__main__':
     #croping image
     cpImg = pngImg.crop((0,15,pngImg.width,pngImg.height))
 
-    simpleImg = cpImg
+    simpleImg = cpImg.copy()
     # filtering the image for colors
     for r in range(cpImg.width):
         for c in range(cpImg.height):
