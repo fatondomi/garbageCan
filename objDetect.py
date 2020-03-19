@@ -1,15 +1,15 @@
 
 from multiprocessing import Process
-from time import sleep
-from time import thread_time
+from time import sleep, thread_time
 import requests
-from PIL import Image 
-from PIL import ImageFilter
+from PIL import Image, ImageFilter
 import io
-import efficiently
+import previousProjects.efficientProject.efficiently as efficiently
+import pickle
 
 fileName = "newpic.png"
-ipAdresa = "http://192.168.0.101:4747"
+ipAdresa = "http://192.168.0.102:4747"
+recalColorGraph = False
 
 def getVideoFeed():
     vidFeed = requests.get(ipAdresa+"/video")
@@ -83,7 +83,16 @@ def getColor(rgbPixel):
     
     return (255,255,255)
 
-colorGraph = efficiently.filter(0,255,3,getColor)
+colorGraph = []
+
+if recalColorGraph:
+    colorGraph = efficiently.filter(0,255,3,getColor)
+    
+    with open('colorGraph.bin','ab') as outfile:
+        pickle.dump(colorGraph,outfile)
+else:
+    with open("colorGraph.bin","rb") as readFile:
+        colorGraph = pickle.load(readFile)
 
 if __name__ == '__main__':
     print("Color graph ready after: {} seconds".format(thread_time())) 
@@ -93,6 +102,8 @@ if __name__ == '__main__':
         ipAdresa/video?640:480
     then you request camera shot with
         ipAdresa/cam/1/frame.jpg
+    '''
+
     helperProcess = Process(target=getVideoFeed,args=())
     helperProcess.daemon = True
 
@@ -108,16 +119,15 @@ if __name__ == '__main__':
     # we need an io object to create a pil Image 
     # a pil Image can be saved in any format we want png or jpg
     ioObject = io.BytesIO(serverResponse.content)
-    pilImg = Image.open(ioObject)
+    pngImg = Image.open(ioObject)
 
-    pilImg.save("newpic.png")
-    '''
+    pngImg.save("newpic.png")
 
-    pngImg = Image.open("newpic.png")
+    #pngImg = Image.open("newpic.png")
     
     #croping image
     cpImg = pngImg.crop((0,15,pngImg.width,pngImg.height))
-    #cpImg.save("cropImage.png")
+    cpImg.save("cropImage.png")
 
     # filtering the image for colors
     for r in range(cpImg.width):
